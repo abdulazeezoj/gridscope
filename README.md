@@ -124,7 +124,7 @@ We will create a serverless application that is capable of serializing a model i
 
 In addition, we also use the SAM (Serverless Application Model) framework to set up resources on AWS in an infrastructure-as-code (IaC) style. This makes it easier to manage resources over time and helps us keep track of changes made to them.
 
-![](docs/assets/aws-architecture.png)
+![Deployment Architecture](docs/assets/aws-architecture.png)
 
 
 #### API Reference
