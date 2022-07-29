@@ -183,7 +183,7 @@ def load_model(size):
     Load trained model
     """
 
-    net = cv2.dnn.readNet(f'model/detect_{size}.onnx')
+    net = cv2.dnn.readNet(f'models/detect_{size}.onnx')
     return net
 
 
