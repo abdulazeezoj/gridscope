@@ -46,14 +46,14 @@ Build your application with the `sam build` command.
 api$ sam build
 ```
 
-The SAM CLI builds a docker image from a Dockerfile and then installs dependencies defined in `src/requirements.txt` inside the docker image. The processed template file is saved in the `.aws-sam/build` folder.
+The SAM CLI builds a docker image from a Dockerfile and then installs dependencies defined in `requirements.txt` inside the docker image. The processed template file is saved in the `.aws-sam/build` folder.
 
 Test a single function by invoking it directly with a test event. An event is a JSON document that represents the input that the function receives from the event source. Test events are included in the `events` folder in this project.
 
 Run functions locally and invoke them with the `sam local invoke` command.
 
 ```bash
-api$ sam local invoke DetectFunction --event events/event.json
+api$ sam local invoke DetectFunction --event event.json
 ```
 
 The SAM CLI can also emulate your application's API. Use the `sam local start-api` to run the API locally on port 3000.
@@ -71,7 +71,7 @@ The SAM CLI reads the application template to determine the API's routes and the
           Type: Api
           Properties:
             Path: /detect
-            Method: get
+            Method: post
 ```
 
 ## Add a resource to your application
@@ -84,7 +84,7 @@ To simplify troubleshooting, SAM CLI has a command called `sam logs`. `sam logs`
 `NOTE`: This command works for all AWS Lambda functions; not just the ones you deploy using SAM.
 
 ```bash
-api$ sam logs -n DetectFunction --stack-name api --tail
+api$ sam logs -n DetectFunction --stack-name powergrid-mapper-api --tail
 ```
 
 You can find more information and examples about filtering Lambda function logs in the [SAM CLI Documentation](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-logging.html).
@@ -95,7 +95,7 @@ Tests are defined in the `tests` folder in this project. Use PIP to install the 
 
 ```bash
 api$ pip install pytest pytest-mock --user
-api$ python -m pytest tests/ -v
+api$ python -m pytest test.py -r A
 ```
 
 ## Cleanup
@@ -103,7 +103,7 @@ api$ python -m pytest tests/ -v
 To delete the sample application that you created, use the AWS CLI. Assuming you used your project name for the stack name, you can run the following:
 
 ```bash
-aws cloudformation delete-stack --stack-name omdena-surplusmap-api
+aws cloudformation delete-stack --stack-name powergrid-mapper-api
 ```
 
 ## Resources
