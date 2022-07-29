@@ -36,6 +36,9 @@ def handler(event, context):
             # return the result
             return {
                 "statusCode": 200,
+                "headers": {
+                    "Content-Type": "application/json"
+                },
                 "body": json.dumps(
                     {
                         "image": image_enc,
@@ -43,21 +46,22 @@ def handler(event, context):
                         "confs": confs,
                         "labels": labels,
                     }
-                ),
-                "contentType": "application/json"
+                )
             }
         else:
             # return the result
             return {
                 "statusCode": 200,
+                "headers": {
+                    "Content-Type": "application/json"
+                },
                 "body": json.dumps(
                     {
                         "bboxes": bboxes,
                         "confs": confs,
                         "labels": labels,
                     }
-                ),
-                "contentType": "application/json"
+                )
             }
 
     except Exception as e:
@@ -65,6 +69,8 @@ def handler(event, context):
 
         return {
             "statusCode": 500,
+            "headers": {
+                "Content-Type": "application/json"
+            },
             "body": json.dumps({"error": repr(e)}),
-            "contentType": "application/json"
         }
