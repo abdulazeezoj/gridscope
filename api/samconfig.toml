@@ -1,0 +1,11 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "omdena-surplusmap-api"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-1a3vbmp7cpvgh"
+s3_prefix = "omdena-surplusmap-api"
+region = "us-east-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
+image_repositories = ["OmdenaSurplusMapFunction=453934962308.dkr.ecr.us-east-1.amazonaws.com/omdenasurplusmapapi10200914/omdenasurplusmapfunctionb5aa9f8brepo"]
