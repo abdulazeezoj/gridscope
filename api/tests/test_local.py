@@ -1,10 +1,18 @@
 """API Local Tests"""
 import json
+import sys
+import os
 
 import pytest
 from PIL import Image
 import requests
 
+# Add `api` to the path
+current = os.path.dirname(os.path.realpath(__file__))
+parent = os.path.dirname(current)
+sys.path.append(parent)
+
+# Import `util` from `api`
 import util
 
 
