@@ -12,17 +12,30 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
-      - name: Set up Python 3.8
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Get Changed Files
+        uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          list-files: shell
+          filters: |
+            py_modified:
+              - added|modified: "./**/*.py"
+      - name: Setup Python 3.8
+        if: ${{ steps.filter.outputs.py_modified == 'true' }}
         uses: actions/setup-python@v3
         with:
           python-version: '3.8'
+          cache: 'pip'
       - name: Install dependencies
+        if: ${{ steps.filter.outputs.py_modified == 'true' }}
         run: |
           python -m pip install --upgrade pip
           pip install aws-sam-cli
       - uses: actions/checkout@v3
       - name: SAM Deploy
+        if: ${{ steps.filter.outputs.py_modified == 'true' }}
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
