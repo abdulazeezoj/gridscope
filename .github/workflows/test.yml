@@ -19,15 +19,42 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
       
-      - name: Get changed files
-        id: changed-files
-        uses: tj-actions/changed-files@v24
+      - name: Get Changes
+        id: changes
+        uses: dorny/paths-filter@v2
+        with:
+          filters: |
+            api:
+              - "api/models/**"
+              - "api/**/*.py"
+              - "api/**/*.yaml"
+              - "api/**/*.toml"
+              - "api/*.txt"
+              - "api/Dockerfile"
+            python:
+              - "**/*.py"
 
-      - name: List all changed files
+      - name: Setup Python 3.8
+        if: steps.changes.outputs.python == 'true' || steps.changes.outputs.api == 'true'
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.8'
+          cache: 'pip'
+      
+      - name: Install dependencies
+        if: steps.changes.outputs.python == 'true' || steps.changes.outputs.api == 'true'
         run: |
-          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
-            echo "$file was changed"
-          done
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      
+      - name: Run Lint
+        if: steps.changes.outputs.python == 'true' || steps.changes.outputs.api == 'true'
+        run: |
+          flake8 ${{ steps.changes.outputs.python_files }}
+      
+      - name: Run Tests
+        if: steps.changes.outputs.python == 'true' || steps.changes.outputs.api == 'true'
+        working-directory: ./api
+        run: |
+          python -m pytest ./tests -r A
