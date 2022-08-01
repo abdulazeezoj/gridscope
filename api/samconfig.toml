@@ -2,10 +2,10 @@ version = 0.1
 [default]
 [default.deploy]
 [default.deploy.parameters]
-stack_name = "omdena-surplusmap-api"
-s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-1a3vbmp7cpvgh"
-s3_prefix = "omdena-surplusmap-api"
+stack_name = "powergrid-mapper"
+s3_bucket = "omdena-surplusmap"
+s3_prefix = "powergrid-mapper"
 region = "us-east-1"
 confirm_changeset = true
 capabilities = "CAPABILITY_IAM"
-image_repositories = ["OmdenaSurplusMapFunction=453934962308.dkr.ecr.us-east-1.amazonaws.com/omdenasurplusmapapi10200914/omdenasurplusmapfunctionb5aa9f8brepo"]
+image_repositories = ["PowergridMapperFunction=453934962308.dkr.ecr.us-east-1.amazonaws.com/omdena-surplusmap"]

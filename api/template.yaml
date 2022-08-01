@@ -9,36 +9,37 @@ Description: >
 Globals:
   Function:
     Timeout: 300
-    MemorySize: 4096
+    MemorySize: 2048
 
 Resources:
-  OmdenaSurplusMapFunction:
+  PowergridMapperFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
       PackageType: Image
+      FunctionName: powergrid-mapper
       Architectures:
         - x86_64
       Events:
-        Detect:
+        PowergridMapper:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
-            Path: /detect
+            Path: /map
             Method: post
     Metadata:
       Dockerfile: Dockerfile
       DockerContext: ./
-      DockerTag: omdena-surplusmap
+      DockerTag: powergrid-mapper
 
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
   # Find out more about other implicit resources you can reference within SAM
   # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
-  OmdenaSurplusMapApi:
-    Description: "API Gateway endpoint URL for Prod stage for OmdenaSurplusMap function"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/prod/detect/"
-  OmdenaSurplusMapFunction:
-    Description: "OmdenaSurplusMap Lambda Function ARN"
-    Value: !GetAtt OmdenaSurplusMapFunction.Arn
-  OmdenaSurplusMapFunctionIamRole:
-    Description: "Implicit IAM Role created for OmdenaSurplusMap function"
-    Value: !GetAtt OmdenaSurplusMapFunctionRole.Arn
+  PowergridMapperApi:
+    Description: "API Gateway endpoint URL for Prod stage for PowergridMapper function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/prod/map/"
+  PowergridMapperFunction:
+    Description: "PowergridMapper Lambda Function ARN"
+    Value: !GetAtt PowergridMapperFunction.Arn
+  PowergridMapperFunctionIamRole:
+    Description: "Implicit IAM Role created for PowergridMapper function"
+    Value: !GetAtt PowergridMapperFunctionRole.Arn

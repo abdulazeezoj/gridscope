@@ -2,7 +2,6 @@
 import argparse
 import base64
 from io import BytesIO
-from pprint import pprint
 from typing import Any, List, Tuple
 
 import cv2
@@ -229,7 +228,7 @@ if __name__ == "__main__":
         print("[INFO] Detection...")
         print_detection(bboxes, confs, labels)
 
-        if render:
+        if args.render:
             print("[INFO] Rendering...")
             image = render(image, bboxes, confs, labels)
 

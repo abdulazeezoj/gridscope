@@ -6,7 +6,7 @@ def handler(event, context):
     """
     lambda handler to execute powergrid detection
     """
-    print(f"[ INFO  ] Reading request...")
+    print("[ INFO  ] Reading request...")
     event = json.loads(event["body"])
     print(f"[ INFO  ] Event keys: {list(event.keys())}")
 
