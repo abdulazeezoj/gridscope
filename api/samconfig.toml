@@ -1,0 +1,11 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "powergrid-mapper"
+s3_bucket = "omdena-surplusmap"
+s3_prefix = "powergrid-mapper"
+region = "us-east-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
+image_repositories = ["PowergridMapperFunction=453934962308.dkr.ecr.us-east-1.amazonaws.com/omdena-surplusmap"]
