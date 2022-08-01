@@ -13,7 +13,7 @@ parent = os.path.dirname(current)
 sys.path.append(parent)
 
 # Import `util` from `api`
-import util
+import util  # noqa: E402
 
 
 @pytest.fixture()
