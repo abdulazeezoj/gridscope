@@ -1,11 +1,11 @@
 """API Deplyment Tests"""
 import json
-import sys
 import os
+import sys
 
 import pytest
-from PIL import Image
 import requests
+from PIL import Image
 
 # Add `api` to the path
 current = os.path.dirname(os.path.realpath(__file__))
@@ -33,10 +33,10 @@ def api_url():
     """ Generates API GW URL"""
 
     return {
-            "method": "POST",
-            "url":
-            "https://u3ipqrwr25.execute-api.us-east-1.amazonaws.com/Prod/map"
-        }
+        "method": "POST",
+        "url":
+        "https://u3ipqrwr25.execute-api.us-east-1.amazonaws.com/Prod/map/"
+    }
 
 
 # Test the handler deployed
@@ -65,53 +65,6 @@ def test_handler_deploy(api_event, api_url):
     util.print_detection(data["bboxes"], data["confs"], data["labels"])
 
 
-# Test the handler deployed with a empty request
-def test_handler_deploy_null_reqest(api_event, api_url):
-    """Test the handler deployed with a empty request"""
-
-    api_event = {}
-    method = api_url["method"]
-    url = api_url["url"]
-
-    req = requests.Request(method, url, json=api_event).prepare()
-    resp = requests.Session().send(req)
-    data = json.loads(resp.text)
-
-    assert resp.status_code == 500
-    assert "error" in data
-
-
-# Test the handler deployed with a bad image
-def test_handler_deploy_bad_image(api_event, api_url):
-    """Test the handler deployed with a bad image"""
-    api_event["image"] = "bad image"
-    method = api_url["method"]
-    url = api_url["url"]
-
-    req = requests.Request(method, url, json=api_event).prepare()
-    resp = requests.Session().send(req)
-    data = json.loads(resp.text)
-
-    assert resp.status_code == 500
-    assert "error" in data
-
-
-# Test the handler deployed with a bad model
-def test_handler_deploy_bad_model(api_event, api_url):
-    """Test the handler deployed with a bad model"""
-
-    api_event["model"] = "bad model"
-    method = api_url["method"]
-    url = api_url["url"]
-
-    req = requests.Request(method, url, json=api_event).prepare()
-    resp = requests.Session().send(req)
-    data = json.loads(resp.text)
-
-    assert resp.status_code == 500
-    assert "error" in data
-
-
 # Test the handler deployed with no render
 def test_handler_deploy_no_render(api_event, api_url):
     """Test the handler deployed with no render"""
@@ -134,3 +87,19 @@ def test_handler_deploy_no_render(api_event, api_url):
 
     print("[ INFO  ] Detection...")
     util.print_detection(data["bboxes"], data["confs"], data["labels"])
+
+
+# Test the handler deployed with a empty request
+def test_handler_deploy_null_reqest(api_event, api_url):
+    """Test the handler deployed with a empty request"""
+
+    api_event = {}
+    method = api_url["method"]
+    url = api_url["url"]
+
+    req = requests.Request(method, url, json=api_event).prepare()
+    resp = requests.Session().send(req)
+    data = json.loads(resp.text)
+
+    assert resp.status_code == 500
+    assert "error" in data

@@ -35,9 +35,9 @@ def api_url():
     return {"method": "POST", "url": "http://127.0.0.1:3000/map"}
 
 
-# Test the handler deployed
+# Test the handler locally
 def test_handler_local(api_event, api_url):
-    """Test the handler deployed"""
+    """Test the handler locally"""
 
     method = api_url["method"]
     url = api_url["url"]
@@ -61,56 +61,9 @@ def test_handler_local(api_event, api_url):
     util.print_detection(data["bboxes"], data["confs"], data["labels"])
 
 
-# Test the handler deployed with a empty request
-def test_handler_local_null_reqest(api_event, api_url):
-    """Test the handler deployed with a empty request"""
-
-    api_event = {}
-    method = api_url["method"]
-    url = api_url["url"]
-
-    req = requests.Request(method, url, json=api_event).prepare()
-    resp = requests.Session().send(req)
-    data = json.loads(resp.text)
-
-    assert resp.status_code == 500
-    assert "error" in data
-
-
-# Test the handler deployed with a bad image
-def test_handler_local_bad_image(api_event, api_url):
-    """Test the handler deployed with a bad image"""
-    api_event["image"] = "bad image"
-    method = api_url["method"]
-    url = api_url["url"]
-
-    req = requests.Request(method, url, json=api_event).prepare()
-    resp = requests.Session().send(req)
-    data = json.loads(resp.text)
-
-    assert resp.status_code == 500
-    assert "error" in data
-
-
-# Test the handler deployed with a bad model
-def test_handler_local_bad_model(api_event, api_url):
-    """Test the handler deployed with a bad model"""
-
-    api_event["model"] = "bad model"
-    method = api_url["method"]
-    url = api_url["url"]
-
-    req = requests.Request(method, url, json=api_event).prepare()
-    resp = requests.Session().send(req)
-    data = json.loads(resp.text)
-
-    assert resp.status_code == 500
-    assert "error" in data
-
-
-# Test the handler deployed with no render
+# Test the handler locally with no render
 def test_handler_local_no_render(api_event, api_url):
-    """Test the handler deployed with no render"""
+    """Test the handler locally with no render"""
 
     api_event["render"] = False
     method = api_url["method"]
@@ -130,3 +83,19 @@ def test_handler_local_no_render(api_event, api_url):
 
     print("[ INFO  ] Detection...")
     util.print_detection(data["bboxes"], data["confs"], data["labels"])
+
+
+# Test the handler locally with a empty request
+def test_handler_local_null_reqest(api_event, api_url):
+    """Test the handler locally with a empty request"""
+
+    api_event = {}
+    method = api_url["method"]
+    url = api_url["url"]
+
+    req = requests.Request(method, url, json=api_event).prepare()
+    resp = requests.Session().send(req)
+    data = json.loads(resp.text)
+
+    assert resp.status_code == 500
+    assert "error" in data
