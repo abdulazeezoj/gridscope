@@ -103,20 +103,20 @@ def test_handler_deploy_null_reqest(api_event, api_url):
     assert "error" in data
 
 
-# Test the handler deployed with a empty request
-# def test_handler_deploy_bad_value(api_event, api_url):
-#     """Test the handler deployed with a empty request"""
+# Test the handler with a bad request value
+def test_handler_deploy_bad_value(api_event, api_url):
+    """Test the handler with a bad request value"""
 
-#     api_event["image"] = "Image"
-#     api_event["model"] = "Model"
-#     api_event["conf"] = "Conf"
-#     api_event["render"] = "Render"
-#     method = api_url["method"]
-#     url = api_url["url"]
+    api_event["image"] = "Image"
+    api_event["model"] = "Model"
+    api_event["conf"] = "Conf"
+    api_event["render"] = "Render"
+    method = api_url["method"]
+    url = api_url["url"]
 
-#     req = requests.Request(method, url, json=api_event).prepare()
-#     resp = requests.Session().send(req)
-#     data = json.loads(resp.text)
+    req = requests.Request(method, url, json=api_event).prepare()
+    resp = requests.Session().send(req)
+    data = json.loads(resp.text)
 
-#     assert resp.status_code == 500
-#     assert "error" in data
+    assert resp.status_code == 500
+    assert "error" in data
