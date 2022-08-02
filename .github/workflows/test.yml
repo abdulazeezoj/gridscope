@@ -14,10 +14,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout Git
         uses: actions/checkout@v3
         with:
+          lfs: true
           token: ${{ secrets.ACCESS_TOKEN }}
+      
+      - name: Checkout LFS
+        run: git lfs checkout
       
       - name: Get Changes
         uses: dorny/paths-filter@v2
