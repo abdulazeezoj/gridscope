@@ -60,4 +60,4 @@ jobs:
         working-directory: ./api
         run: |
           ls -l
-          python -m pytest tests/test_deploy.py -r A
+          pytest tests/test_deploy.py -r A

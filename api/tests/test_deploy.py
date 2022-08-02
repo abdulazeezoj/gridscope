@@ -51,7 +51,6 @@ def test_handler_deploy(api_event, api_url):
     data = json.loads(resp.text)
 
     assert resp.status_code == 200
-
     assert "image" in data
     assert "bboxes" in data
     assert "confs" in data
@@ -78,7 +77,6 @@ def test_handler_deploy_no_render(api_event, api_url):
     data = json.loads(resp.text)
 
     assert resp.status_code == 200
-
     assert "image" not in data
     assert "bboxes" in data
     assert "confs" in data
