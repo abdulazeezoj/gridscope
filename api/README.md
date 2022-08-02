@@ -1,7 +1,9 @@
 <div align='center'>
-<h1>API Reference</h1>
+<h1>Power Grid Mapper Deployment</h1>
 Identifying Power Infrastructure Through GIS and Machine Learning to Accelerate the Green Transition
 </div>
+
+---
 
 ## Table of Contents
 
@@ -11,108 +13,91 @@ Identifying Power Infrastructure Through GIS and Machine Learning to Accelerate 
     * [API Reference](#api-reference)
     * [Demo](#demo)
 
-This folder contains source code and supporting files for the model deployment as a serverless application that you can deploy with the SAM CLI. It includes the following files and folders.
+---
 
-- images/ - images used in the model deployment testing
-- models/ - models used in the model deployment
-- labels.txt - A list of labels that the model can recognize.
-- Dockerfile - The Dockerfile that you can use to build the application.
-- app.py - The application's main file.
-- util.py - Utility functions used in the application.
-- test.py - Unit tests for the application code.
-- samconfig.toml - The SAM configuration file.
-- template.yaml - A template that defines the application's AWS resources.
+Now that we have a trained model available, our goal is to make this model available for use. To achieve this, we decided to find somewhere to host your models and expose them via REST APIs. This can make it easy for end users to integrate the model outputs directly into their applications and business processes.
+Moreover, Serverless computing is a new approach to building applications that allows users to create and run their code without first having to manage the underlying physical resources. In serverless computing, an application's code is hosted in a centralized location and accessed through APIs, which are then used by the application. This model allows for the creation of more complex applications, as well as those that need to scale easily.
 
-The application uses several AWS resources, including Lambda functions and an API Gateway API. These resources are defined in the `template.yaml` file in this project. You can update the template to add AWS resources through the same deployment process that updates your application code.
+#### Approach
+Building a custom training and serving workflow is hard. It's also incredibly important because it determines how you're going to handle the operational aspects of your product. The goal here is to produce a simple deploy workflow that works in any CI/CD tool. In addition, we want to:
+- Use a docker container, to serve anywhere containers can run
+- Expose a REST API so that others can consume it
+- Minimize the complexity and attack surface of the operational container
 
-## Deploy the sample application
+We will create a serverless application that is capable of serializing a model inside of a Docker container, and then packaging the service with Docker and AWS ECR. We will then use AWS Lambda to serve the model with an API (serverless API) that is built on top of it. Finally, we will build, test, and deploy our project in a CI/CD workflow using GitHub Actions.
 
-The Serverless Application Model Command Line Interface (SAM CLI) is an extension of the AWS CLI that adds functionality for building and testing Lambda applications. It uses Docker to run your functions in an Amazon Linux environment that matches Lambda. It can also emulate your application's build environment and API.
+In addition, we also use the SAM (Serverless Application Model) framework to set up resources on AWS in an infrastructure-as-code (IaC) style. This makes it easier to manage resources over time and helps us keep track of changes made to them.
 
-To use the SAM CLI, you need the following tools.
+![Deployment Architecture](../docs/assets/aws-architecture.png)
 
-* SAM CLI - [Install the SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html)
-* Docker - [Install Docker community edition](https://hub.docker.com/search/?type=edition&offering=community)
 
-You may need the following for local testing.
-* [Python 3 installed](https://www.python.org/downloads/)
+#### API Reference
+The API is organized around REST. Our API has predictable resource-oriented URLs, accepts form-encoded request bodies, returns JSON-encoded responses, and uses standard HTTP response codes.
 
-To build and deploy your application for the first time, run the following in your shell:
+**Base URL**
 
-```bash
-sam sam build --cached --parallel
-sam deploy
-```
+`https://ppp1mtcq9k.execute-api.us-east-1.amazonaws.com/demo/detect`
 
-The first command will build a docker image from a Dockerfile and then copy the source of your application inside the Docker image. The second command will package and deploy your application to AWS, with a series of prompts. You can find your API Gateway Endpoint URL in the output values displayed after deployment.
+**Parameters**  
 
-## Use the SAM CLI to build and test locally
+`image` - satellite image in base64 string  
+`model` - model to be used [oyela_1, oyela_2, oyela_3]  
+`conf`  - confidence score to filter detection [0.1 to 1]
 
-Build your application with the `sam build` command.
+**Response**
 
-```bash
-api$ sam build --cached --parallel
-```
+`statusCode`  - value is  200  or  500  
+`detection`   - dictionary containing the following;  
+- `image`   - rendered image in  base64 string  
+- `bboxes`  - bounding boxes of the detection [0.1 to 1]  
+- `confs`   - confidence of the detection [0.1 to 1]  
+- `labels`  - labels of the detection  [pylon, substation, power-station]   
+- `error`   - return details of the error if statusCode is  500  
 
-The SAM CLI builds a docker image from a Dockerfile and then installs dependencies defined in `requirements.txt` inside the docker image. The processed template file is saved in the `.aws-sam/build` folder.
+**Sample Request**
 
-The SAM CLI can also emulate your application's API. Use the `sam local start-api` to run the API locally on port 3000.
-
-```bash
-api$ sam local start-api
-```
-
-## Unit tests
-
-Tests are defined in the `tests` folder in this project. Use PIP to install the [pytest](https://docs.pytest.org/en/latest/) and run unit tests from your local machine.
-
-```bash
-api$ python -m pytest test.py -r A
-```
-
-## API Endpoint
-```bash
-https://psrjglc2a8.execute-api.us-east-1.amazonaws.com/prod/detect
-```
-
-## Create ECR Repo
-```bash
-api$ aws ecr create-repository --repository-name omdena-surplusmap --image-tag-mutability IMMUTABLE --image-scanning-configuration scanOnPush=true
-```
-```bash
-{
-    "repository": {
-        "repositoryArn": "arn:aws:ecr:us-east-1:453934962308:repository/omdena-surplusmap",
-        "registryId": "453934962308",
-        "repositoryName": "omdena-surplusmap",
-        "repositoryUri": "453934962308.dkr.ecr.us-east-1.amazonaws.com/omdena-surplusmap",
-        "createdAt": "2022-07-30T20:18:52+01:00",
-        "imageTagMutability": "IMMUTABLE",
-        "imageScanningConfiguration": {
-            "scanOnPush": true
-        },
-        "encryptionConfiguration": {
-            "encryptionType": "AES256"
-        }
-    }
+``` python
+from pprint import pprint
+import time, requests, _src
+from PIL import Image
+ 
+print("[INFO] Preparing request...")
+data = {
+    "image": _src.encode_image(Image.open('images/img2.png')),
+    "model": oyela_1,
+    "score": 0.5
 }
+url = "https://ppp1mtcq9k.execute-api.us-east-1.amazonaws.com/demo/detect"
+ 
+print("[INFO] Sending request...")
+t0 = time.time()
+response = requests.post(url, json=data).json()
+delta = time.time() - t0
+print(f"[INFO] Request took {delta:.3} seconds")
+print("[INFO] Processing response...")
+if response.get("statusCode") == 200:
+    response = response["detection"]
+    image = _src.decode_image(response["image"])
+    response.pop("image")
+    pprint(response)
+    image.save('images/api_out2.png')
+elif response.get("statusCode") == 500:
+    response = response['detection']
+    print(f"[ERROR] {response['error']}")
+ 
+========== [OUTPUT] ==========
+ 
+{
+    'bboxes': [[853, 169, 41, 53], [197, 567, 56, 49]],
+    'confs': [0.8610458374023438, 0.8063827157020569],
+    'labels': ['pylon', 'pylon']
+}
+
 ```
 
-## Build
-```bash
-api$ sam build
-```
+#### Demo  
+[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://abdulazeezoj-powergrid-mapper-demo-app-deploy-s1zigm.streamlitapp.com)  
 
-## Test
-```bash
-api$ sam local start-api
-```
+The demo is a simple web application that allows users to upload an image and then use the API to detect pylons, substations and power stations.
 
-```bash
-api$ python -m pytest test_local.py -r A
-```
-
-## Deploy
-```bash
-api$ sam deploy --guided
-```
+![Deployment Demo](../docs/assets/deployment_demo.gif)
