@@ -26,9 +26,9 @@ jobs:
           filters: |
             api:
               - "api/models/**"
-              - "api/**/*.py"
-              - "api/**/*.yaml"
-              - "api/**/*.toml"
+              - "api/*.py"
+              - "api/*.yaml"
+              - "api/*.toml"
               - "api/*.txt"
               - "api/Dockerfile"
             python:
@@ -59,4 +59,4 @@ jobs:
         if: steps.changes.outputs.python == 'true' || steps.changes.outputs.api == 'true'
         working-directory: ./api
         run: |
-          python -m pytest ./tests -r A
+          python -m pytest tests/test_deploy.py -r A

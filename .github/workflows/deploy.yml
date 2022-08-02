@@ -24,16 +24,14 @@ jobs:
           filters: |
             api:
               - "api/models/**"
-              - "api/**/*.py"
-              - "api/**/*.yaml"
-              - "api/**/*.toml"
+              - "api/*.py"
+              - "api/*.yaml"
+              - "api/*.toml"
               - "api/*.txt"
               - "api/Dockerfile"
-            python:
-              - "**/*.py"
 
       - name: Setup Python 3.8
-        if: steps.changes.outputs.python == 'true' || steps.changes.outputs.api == 'true'
+        if: steps.changes.outputs.api == 'true'
         uses: actions/setup-python@v3
         with:
           python-version: '3.8'
@@ -57,3 +55,9 @@ jobs:
         run: |
           sam build
           sam deploy --no-confirm-changeset --no-fail-on-empty-changeset
+      
+      - name: Run Tests
+        if: steps.changes.outputs.api == 'true'
+        working-directory: ./api
+        run: |
+          python -m pytest tests/test_deploy.py -r A
