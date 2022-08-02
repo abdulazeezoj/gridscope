@@ -59,4 +59,5 @@ jobs:
         if: steps.changes.outputs.python == 'true' || steps.changes.outputs.api == 'true'
         working-directory: ./api
         run: |
+          ls -l
           python -m pytest tests/test_deploy.py -r A
