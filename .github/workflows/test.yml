@@ -19,8 +19,9 @@ jobs:
         with:
           lfs: true
           token: ${{ secrets.ACCESS_TOKEN }}
-        run: |
-          git lfs checkout
+      
+      - name: Checkout LFS
+        run: git lfs checkout
       
       - name: Get Changes
         uses: dorny/paths-filter@v2
