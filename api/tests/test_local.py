@@ -32,7 +32,7 @@ def api_event():
 def api_url():
     """ Generates API GW URL"""
 
-    return {"method": "POST", "url": "http://127.0.0.1:3000/map"}
+    return {"method": "POST", "url": "http://localhost:9000/2015-03-31/functions/function/invocations"}
 
 
 # Test the handler locally
@@ -42,9 +42,9 @@ def test_handler_local(api_event, api_url):
     method = api_url["method"]
     url = api_url["url"]
 
-    req = requests.Request(method, url, json=api_event).prepare()
+    req = requests.Request(method, url, json=json.dumps(api_event)).prepare()
     resp = requests.Session().send(req)
-    data = json.loads(resp.text)
+    data = json.loads(resp.json().get("body"))
 
     assert resp.status_code == 200
 
@@ -57,7 +57,7 @@ def test_handler_local(api_event, api_url):
     image = util.decode_image(data["image"])
     image.save("images/test1_out.png")
 
-    print("[ INFO  ] Detection...")
+    print("[ INFO  ] Detection:")
     util.print_detection(data["bboxes"], data["confs"], data["labels"])
 
 
@@ -69,9 +69,11 @@ def test_handler_local_no_render(api_event, api_url):
     method = api_url["method"]
     url = api_url["url"]
 
-    req = requests.Request(method, url, json=api_event).prepare()
+    req = requests.Request(method, url, json=json.dumps(api_event)).prepare()
     resp = requests.Session().send(req)
-    data = json.loads(resp.text)
+    data = json.loads(resp.json().get("body"))
+
+    print("[ INFO ] ", data)
 
     assert resp.status_code == 200
 
@@ -81,7 +83,7 @@ def test_handler_local_no_render(api_event, api_url):
     assert "labels" in data
     assert "error" not in data
 
-    print("[ INFO  ] Detection...")
+    print("[ INFO  ] Detection:")
     util.print_detection(data["bboxes"], data["confs"], data["labels"])
 
 
@@ -93,12 +95,16 @@ def test_handler_local_null_reqest(api_event, api_url):
     method = api_url["method"]
     url = api_url["url"]
 
-    req = requests.Request(method, url, json=api_event).prepare()
+    req = requests.Request(method, url, json=json.dumps(api_event)).prepare()
     resp = requests.Session().send(req)
-    data = json.loads(resp.text)
+    data = json.loads(resp.json().get("body"))
 
-    assert resp.status_code == 500
+    print("[ INFO ] ", data)
+
+    assert resp.status_code == 200
     assert "error" in data
+
+    print("[ ERROR ] ", data["error"])
 
 
 # Test the handler with a bad request value
@@ -112,9 +118,13 @@ def test_handler_local_bad_value(api_event, api_url):
     method = api_url["method"]
     url = api_url["url"]
 
-    req = requests.Request(method, url, json=api_event).prepare()
+    req = requests.Request(method, url, json=json.dumps(api_event)).prepare()
     resp = requests.Session().send(req)
-    data = json.loads(resp.text)
+    data = json.loads(resp.json().get("body"))
 
-    assert resp.status_code == 500
+    print("[ INFO ] ", data)
+
+    assert resp.status_code == 200
     assert "error" in data
+
+    print("[ ERROR ] ", data["error"])

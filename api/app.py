@@ -7,13 +7,14 @@ def handler(event, context):
     lambda handler to execute powergrid detection
     """
     print("[ INFO  ] Reading request...")
-    event = json.loads(event["body"])
-    print(f"[ INFO  ] Event keys: {list(event.keys())}")
+    print("[ INFO  ] Event type: {}".format(type(event)))
+    body = json.loads(event)
+    print(f"[ INFO  ] Event keys: {list(body.keys())}")
 
-    _image = event.get("image", None)
-    _model = event.get("model", "m")
-    _conf = event.get("conf", 0.5)
-    _render = event.get("render", False)
+    _image = body.get("image", None)
+    _model = body.get("model", "m")
+    _conf = body.get("conf", 0.5)
+    _render = body.get("render", False)
 
     try:
         print("[ INFO  ] Reading image...")

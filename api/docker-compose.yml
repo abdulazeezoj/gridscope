@@ -1,0 +1,10 @@
+version: "3.9"
+services:
+  powergrid-mapper:
+    image: "powergrid-mapper"
+    container_name: "powergrid-mapper"
+    build: .
+    ports:
+      - "9000:8080"
+    volumes:
+      - ./:/var/task

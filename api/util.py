@@ -1,6 +1,7 @@
 # Define imports
 import argparse
 import base64
+import os
 from io import BytesIO
 from typing import Any, List, Tuple
 
@@ -11,7 +12,8 @@ from PIL import Image
 # Configs
 INPUT_WIDTH = 640
 INPUT_HEIGHT = 640
-LABELS = open("labels.txt").read().strip().split("\n")
+LABELS_PATH = os.path.join(os.path.dirname(__file__), "labels.txt")
+LABELS = open(LABELS_PATH).read().strip().split("\n")
 
 SCORE_THRESH: float = 0.5
 NMS_THRESH: float = 0.45
@@ -66,18 +68,18 @@ def render(image, *detection):
         height = bbox[3]
         text = f"{label} {conf:.2%}"
 
-        cv2.rectangle(image, (left, top),
-                      (left + width, top + height), BLUE, 3*THICKNESS)
+        cv2.rectangle(image, (left, top), (left + width, top + height), BLUE, 3 * THICKNESS)
 
         # Get text size.
         dim, baseline = cv2.getTextSize(text, FONT_FACE, FONT_SCALE, THICKNESS)
         # Use text size to create a BLACK rectangle.
-        cv2.rectangle(image, (left, top),
-                      (left + dim[0], top - dim[1] - baseline),
-                      BLACK, cv2.FILLED)
+        cv2.rectangle(
+            image, (left, top), (left + dim[0], top - dim[1] - baseline), BLACK, cv2.FILLED
+        )
         # Display text inside the rectangle.
-        cv2.putText(image, text, (left, top - 5),
-                    FONT_FACE, FONT_SCALE, YELLOW, THICKNESS, cv2.LINE_AA)
+        cv2.putText(
+            image, text, (left, top - 5), FONT_FACE, FONT_SCALE, YELLOW, THICKNESS, cv2.LINE_AA
+        )
 
     # Convert numpy array to pillow image.
     image = Image.fromarray(image)
@@ -90,22 +92,20 @@ def print_detection(bboxes, confs, labels):
     Print detection results as a table
     """
     print("-" * 75)
-    print("{:<15} {:<15} {:<10} {:<10} {:<10} {:<10}".format("Label",
-                                                             "Confidence",
-                                                             "Left",
-                                                             "Top",
-                                                             "Width",
-                                                             "Height"))
+    print(
+        "{:<15} {:<15} {:<10} {:<10} {:<10} {:<10}".format(
+            "Label", "Confidence", "Left", "Top", "Width", "Height"
+        )
+    )
     print("-" * 75)
     for bbox, conf, label in zip(bboxes, confs, labels):
-        print("{:<15} {:<15} {:<10} {:<10} {:<10} {:<10}".format(label,
-                                                                 conf,
-                                                                 *bbox))
+        print("{:<15} {:<15} {:<10} {:<10} {:<10} {:<10}".format(label, conf, *bbox))
     print("-" * 75)
 
 
-def parse(results: Any, image: Any,
-          CONF_THRESH: float = 0.45) -> Tuple[List[Any], List[Any], List[Any]]:
+def parse(
+    results: Any, image: Any, CONF_THRESH: float = 0.45
+) -> Tuple[List[Any], List[Any], List[Any]]:
     """
     Extract the bounding box and image from the detection
     """
@@ -131,14 +131,14 @@ def parse(results: Any, image: Any,
             _class = np.argmax(scores)
 
             #  Continue if the class score is above threshold.
-            if (scores[_class] > SCORE_THRESH):
+            if scores[_class] > SCORE_THRESH:
                 confs.append(_conf)
                 classes.append(_class)
 
                 cx, cy, w, h = res[0], res[1], res[2], res[3]
 
-                left = int((cx - w/2) * x_factor)
-                top = int((cy - h/2) * y_factor)
+                left = int((cx - w / 2) * x_factor)
+                top = int((cy - h / 2) * y_factor)
                 width = int(w * x_factor)
                 height = int(h * y_factor)
 
@@ -162,7 +162,7 @@ def detect(image, net, CONF_THRESH=0.45):
     image = np.array(image)
 
     # Create a blob from a frame.
-    blob = cv2.dnn.blobFromImage(image, 1/255, (INPUT_WIDTH, INPUT_HEIGHT))
+    blob = cv2.dnn.blobFromImage(image, 1 / 255, (INPUT_WIDTH, INPUT_HEIGHT))
 
     # Sets the input to the network.
     net.setInput(blob)
@@ -182,7 +182,7 @@ def load_model(size):
     Load trained model
     """
 
-    net = cv2.dnn.readNet(f'models/detect_{size}.onnx')
+    net = cv2.dnn.readNet(f"./models/detect_{size}.onnx")
     return net
 
 
@@ -202,14 +202,10 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Detect objects in image")
 
     # Add arguments.
-    parser.add_argument("--image", type=str, required=True,
-                        help="Path to image")
-    parser.add_argument("--model", type=str, default="m",
-                        help="Model size to use (n, s, m, l, x)")
-    parser.add_argument("--conf", type=float, default=0.5,
-                        help="Confidence threshold")
-    parser.add_argument("--render", action="store_true",
-                        help="Render image with bounding boxes")
+    parser.add_argument("--image", type=str, required=True, help="Path to image")
+    parser.add_argument("--model", type=str, default="m", help="Model size to use (n, s, m, l, x)")
+    parser.add_argument("--conf", type=float, default=0.5, help="Confidence threshold")
+    parser.add_argument("--render", action="store_true", help="Render image with bounding boxes")
 
     # Parse arguments.
     args = parser.parse_args()
@@ -237,7 +233,7 @@ if __name__ == "__main__":
 
             print("[INFO] Decoding image...")
             output = decode_image(image_enc)
-            output.save(f'{args.image[:-4]}_out.png')
+            output.save(f"{args.image[:-4]}_out.png")
     except Exception as e:
         print(f"[ERROR] {e}")
         exit(1)

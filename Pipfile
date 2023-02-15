@@ -1,0 +1,18 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+opencv-python-headless = "*"
+pillow = "*"
+
+[dev-packages]
+black = "*"
+flake8 = "*"
+pytest = "*"
+requests = "*"
+
+[requires]
+python_version = "3.8"
+python_full_version = "3.8.16"

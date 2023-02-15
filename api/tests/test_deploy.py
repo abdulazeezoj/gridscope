@@ -46,11 +46,12 @@ def test_handler_deploy(api_event, api_url):
     method = api_url["method"]
     url = api_url["url"]
 
-    req = requests.Request(method, url, json=api_event).prepare()
+    req = requests.Request(method, url, json=json.dumps(api_event)).prepare()
     resp = requests.Session().send(req)
-    data = json.loads(resp.text)
+    data = json.loads(resp.json().get("body"))
 
     assert resp.status_code == 200
+
     assert "image" in data
     assert "bboxes" in data
     assert "confs" in data
@@ -60,7 +61,7 @@ def test_handler_deploy(api_event, api_url):
     image = util.decode_image(data["image"])
     image.save("images/test1_out.png")
 
-    print("[ INFO  ] Detection...")
+    print("[ INFO  ] Detection:")
     util.print_detection(data["bboxes"], data["confs"], data["labels"])
 
 
@@ -72,18 +73,21 @@ def test_handler_deploy_no_render(api_event, api_url):
     method = api_url["method"]
     url = api_url["url"]
 
-    req = requests.Request(method, url, json=api_event).prepare()
+    req = requests.Request(method, url, json=json.dumps(api_event)).prepare()
     resp = requests.Session().send(req)
-    data = json.loads(resp.text)
+    data = json.loads(resp.json().get("body"))
+
+    print("[ INFO ] ", data)
 
     assert resp.status_code == 200
+
     assert "image" not in data
     assert "bboxes" in data
     assert "confs" in data
     assert "labels" in data
     assert "error" not in data
 
-    print("[ INFO  ] Detection...")
+    print("[ INFO  ] Detection:")
     util.print_detection(data["bboxes"], data["confs"], data["labels"])
 
 
@@ -95,12 +99,16 @@ def test_handler_deploy_null_reqest(api_event, api_url):
     method = api_url["method"]
     url = api_url["url"]
 
-    req = requests.Request(method, url, json=api_event).prepare()
+    req = requests.Request(method, url, json=json.dumps(api_event)).prepare()
     resp = requests.Session().send(req)
-    data = json.loads(resp.text)
+    data = json.loads(resp.json().get("body"))
 
-    assert resp.status_code == 500
+    print("[ INFO ] ", data)
+
+    assert resp.status_code == 200
     assert "error" in data
+
+    print("[ ERROR ] ", data["error"])
 
 
 # Test the handler with a bad request value
@@ -114,9 +122,13 @@ def test_handler_deploy_bad_value(api_event, api_url):
     method = api_url["method"]
     url = api_url["url"]
 
-    req = requests.Request(method, url, json=api_event).prepare()
+    req = requests.Request(method, url, json=json.dumps(api_event)).prepare()
     resp = requests.Session().send(req)
-    data = json.loads(resp.text)
+    data = json.loads(resp.json().get("body"))
 
-    assert resp.status_code == 500
+    print("[ INFO ] ", data)
+
+    assert resp.status_code == 200
     assert "error" in data
+
+    print("[ ERROR ] ", data["error"])
